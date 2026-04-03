@@ -19,8 +19,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build app
+        run: npm run build
+
       - name: Start app
-        run: npm run dev &
+        run: npm start &
 
       - name: Wait for app
         run: npx wait-on http://localhost:3000
