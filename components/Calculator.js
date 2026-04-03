@@ -34,9 +34,10 @@ export default function Calculator() {
     "3",
     "-",
     "0",
+    "E",
     "C",
-    "=",
     "+",
+    "=",
   ];
 
   return (
