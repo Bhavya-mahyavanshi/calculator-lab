@@ -1,40 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Calculator Lab
 
-## Getting Started
+> A functional arithmetic calculator built with Next.js 15 and React 19, covered by a full Cypress end-to-end test suite that validates all four arithmetic operations against the live UI.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## What it does
+
+Calculator Lab is a single-page Next.js application that implements a four-operation arithmetic calculator using React's `useState` hook for display state management. The project's emphasis is on **test coverage** — every operation (addition, subtraction, multiplication, division) is verified by Cypress e2e tests that interact with the actual rendered UI, not mocked logic.
+
+---
+
+## Features
+
+- Addition, subtraction, multiplication, and division
+- 4×4 button grid rendered from a declarative `buttons` array — adding a new button is a one-line change
+- Display initialises to `"0"` and prevents leading zeros by replacing the initial value on first input
+- Clear (`C`) resets display to `"0"`; `=` evaluates the expression and catches parse errors gracefully, displaying `"Error"` instead of crashing
+- Full Cypress e2e test suite covering all four operations with real button clicks and input assertions
+
+---
+
+## Tech stack
+
+| | |
+|---|---|
+| Framework | Next.js 15 (Pages Router) |
+| UI library | React 19 |
+| Testing | Cypress 15 (end-to-end) |
+| Linting | ESLint 9 with `eslint-config-next` |
+| Build | `next build` → static export ready |
+
+---
+
+## Project structure
+
+```
+calculator-lab/
+├── components/
+│   └── Calculator.js          Single component — display state, button grid, handlers
+├── pages/
+│   └── index.js               Renders <Calculator /> — no wrapper logic
+├── cypress/
+│   └── e2e/
+│       └── spec.cy.js         4 test cases: addition, subtraction, multiplication, division
+├── styles/
+│   ├── globals.css            CSS custom properties, dark mode via prefers-color-scheme
+│   └── Home.module.css        Module-scoped layout styles (unused in calculator flow)
+└── next.config.mjs            reactStrictMode: true
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## How the calculator works
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+**State:** a single `display` string initialised to `"0"`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+**Input handling (`handleClick`):** if the display is currently `"0"`, the incoming digit or operator *replaces* it — preventing `"07"`. Otherwise it appends.
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Evaluation (`handleEquals`):** passes the accumulated display string to `eval()` inside a `try/catch`. Any invalid expression (e.g. dangling operator) sets the display to `"Error"` without throwing to the UI.
 
-## Learn More
+**Button rendering:** the 16 buttons are declared as a flat array and mapped to `<button>` elements. Each button delegates to one of three handlers based on its value (`"C"`, `"="`, or any digit/operator).
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+## Cypress test suite
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+All four tests follow the same pattern: visit `localhost:3000`, click the operand buttons, click the operator, click `=`, and assert the input value.
 
-## Deploy on Vercel
+```
+✓ Addition          5 + 3 = 8
+✓ Subtraction       10 − 4 = 6
+✓ Multiplication    6 × 7 = 42
+✓ Division          15 ÷ 3 = 5
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Tests use `cy.contains()` to find buttons by their visible label and `cy.get("input").should("have.value", ...)` to assert the result — testing the real DOM, not implementation internals.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+---
+
+## Getting started
+
+**Prerequisites:** Node.js 18+
+
+```bash
+# Clone
+git clone https://github.com/Bhavya-mahyavanshi/calculator-lab.git
+cd calculator-lab
+
+# Install
+npm install
+
+# Run dev server
+npm run dev
+# → http://localhost:3000
+```
+
+**Run Cypress tests** (dev server must be running on port 3000):
+
+```bash
+# Open Cypress UI
+npx cypress open
+
+# Or run headless
+npx cypress run
+```
+
+---
+
+## Author
+
+**Bhavya Mahyavanshi** · Java Full-Stack Developer
+
+[LinkedIn](https://linkedin.com/in/bhavya-mahyavanshi) · [GitHub](https://github.com/Bhavya-mahyavanshi) · [Portfolio](https://bhavya-mahyavanshi.vercel.app)
